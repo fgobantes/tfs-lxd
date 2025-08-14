@@ -1,14 +1,13 @@
-#TODO: Fix sheabang later
-##!/usr/bin/env bash
+#!/usr/bin/env bash
 set -euo pipefail
 
 VM_NAME="${VM_NAME:-tfs-vm}"
 DEVSPACE_MODE="${DEVSPACE_MODE:-no}"
 
-# 0) Setup LXD (NixOS: assume LXD is pre-installed)
-if ! command -v lxd >/dev/null 2>&1 && ! command -v lxc >/dev/null 2>&1; then
-  echo "[lxd] ERROR: LXD/LXC not found in PATH. Install it before running this script."
-  exit 1
+# 0) Setup LXD
+if ! snap list 2>/dev/null | grep -q '^lxd '; then
+  echo "[lxd] Installing LXD snap..."
+  sudo snap install lxd
 fi
 
 if ! groups | grep -q lxd; then
@@ -19,8 +18,8 @@ fi
 
 if ! ${USE_SUDO} lxc info >/dev/null 2>&1; then
   echo "[lxd] Initializing LXD..."
-  ${USE_SUDO} lxd init --minimal
-fi
+  sudo lxd init --minimal
+fi  
 
 # Check VM state
 VM_EXISTS=false
@@ -86,22 +85,11 @@ fi
 # Create VM if needed
 if [[ "$VM_EXISTS" == "false" ]]; then
   echo "[lxd] Creating new VM..."
-
-  # ${USE_SUDO} lxc profile create vm-profile 2>/dev/null || true
-  # ${USE_SUDO} lxc profile device remove vm-profile eth0 2>/dev/null || true
-  # ${USE_SUDO} lxc profile device add vm-profile eth0 nic nictype=bridged parent=mylxdbr0
-
-  
-
-  ${USE_SUDO} lxc init ubuntu:24.04 "${VM_NAME}" --vm \
+  ${USE_SUDO} lxc launch ubuntu:24.04 "${VM_NAME}" --vm \
+    -c limits.cpu=4 \
     -c limits.memory=8GiB \
-    -c security.secureboot=false
-
-  STORAGE_POOL=$(${USE_SUDO} lxc storage list --format csv | head -n1 | cut -d',' -f1)
-  ${USE_SUDO} lxc config device add "${VM_NAME}" root disk pool="${STORAGE_POOL}" path=/
-  ${USE_SUDO} lxc config device add "${VM_NAME}" eth0 nic network=lxdbr0
-
-  ${USE_SUDO} lxc start "${VM_NAME}" 
+    -c security.secureboot=false \
+    --device root,size=100GiB
 
   echo "[lxd] Waiting for VM to start..."
   timeout=600
