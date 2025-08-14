@@ -20,3 +20,5 @@ Try `lxc info --show-log local:tfs-vm` for more info
   # ${USE_SUDO} lxc config device add "${VM_NAME}" eth0 nic network=lxdbr0 boot.index=0
 
   # ${USE_SUDO} lxc start "${VM_NAME}"
+
+Error: Failed setting up device via monitor: Failed setting up device "eth0": Failed adding NIC device: Invalid parameter type for 'bootindex', expected: integer
