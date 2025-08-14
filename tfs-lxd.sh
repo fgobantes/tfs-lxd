@@ -19,7 +19,7 @@ fi
 if ! ${USE_SUDO} lxc info >/dev/null 2>&1; then
   echo "[lxd] Initializing LXD..."
   sudo lxd init --minimal
-fi  
+fi
 
 # Check VM state
 VM_EXISTS=false
