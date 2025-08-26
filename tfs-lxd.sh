@@ -3,6 +3,8 @@ set -euo pipefail
 
 VM_NAME="${VM_NAME:-tfs-vm}"
 DEVSPACE_MODE="${DEVSPACE_MODE:-no}"
+RUN_JULIA="${RUN_JULIA:-false}" 
+CONFIG_PATH="${CONFIG_PATH:-test/data/config3.toml}"
 
 # 0) Setup LXD
 if ! snap list 2>/dev/null | grep -q '^lxd '; then
@@ -132,10 +134,12 @@ if [[ "$DEPLOYMENT_COMPLETE" == "true" ]]; then
   # '
 
   # After part 2 completes, run Julia setup
-  echo "[lxd] Part 2 complete, running Julia setup..."
-  ${USE_SUDO} lxc file push "./bootstrap-julia.sh" "${VM_NAME}/home/tfsuser/bootstrap-julia.sh"
-  ${USE_SUDO} lxc exec "${VM_NAME}" -- bash -c 'chown tfsuser:tfsuser /home/tfsuser/bootstrap-julia.sh && chmod +x /home/tfsuser/bootstrap-julia.sh'
-  ${USE_SUDO} lxc exec "${VM_NAME}" -- sudo -u tfsuser bash -c "/home/tfsuser/bootstrap-julia.sh"
+  if [[ "$RUN_JULIA_BOOTSTRAP" == "true" ]]; then
+    echo "[lxd] Part 2 complete, running Julia setup..."
+    ${USE_SUDO} lxc file push "./bootstrap-julia.sh" "${VM_NAME}/home/tfsuser/bootstrap-julia.sh"
+    ${USE_SUDO} lxc exec "${VM_NAME}" -- bash -c 'chown tfsuser:tfsuser /home/tfsuser/bootstrap-julia.sh && chmod +x /home/tfsuser/bootstrap-julia.sh'
+    ${USE_SUDO} lxc exec "${VM_NAME}" -- sudo -u tfsuser env CONFIG_PATH="${CONFIG_PATH}" bash -c "/home/tfsuser/bootstrap-julia.sh"
+  fi
 
 elif [[ "$PART1_COMPLETE" == "false" ]]; then
   echo "[lxd] Running bootstrap part 1..."
@@ -183,10 +187,12 @@ if [[ "$PART1_COMPLETE" == "true" && "$DEPLOYMENT_COMPLETE" == "false" ]]; then
   ${USE_SUDO} lxc exec "${VM_NAME}" -- sudo -u tfsuser bash -c "/home/tfsuser/bootstrap-part2.sh"
 
   # After part 2 completes, run Julia setup
-  echo "[lxd] Part 2 complete, running Julia setup..."
-  ${USE_SUDO} lxc file push "./bootstrap-julia.sh" "${VM_NAME}/home/tfsuser/bootstrap-julia.sh"
-  ${USE_SUDO} lxc exec "${VM_NAME}" -- bash -c 'chown tfsuser:tfsuser /home/tfsuser/bootstrap-julia.sh && chmod +x /home/tfsuser/bootstrap-julia.sh'
-  ${USE_SUDO} lxc exec "${VM_NAME}" -- sudo -u tfsuser bash -c "/home/tfsuser/bootstrap-julia.sh"
+  if [[ "$RUN_JULIA_BOOTSTRAP" == "true" ]]; then
+    echo "[lxd] Part 2 complete, running Julia setup..."
+    ${USE_SUDO} lxc file push "./bootstrap-julia.sh" "${VM_NAME}/home/tfsuser/bootstrap-julia.sh"
+    ${USE_SUDO} lxc exec "${VM_NAME}" -- bash -c 'chown tfsuser:tfsuser /home/tfsuser/bootstrap-julia.sh && chmod +x /home/tfsuser/bootstrap-julia.sh'
+    ${USE_SUDO} lxc exec "${VM_NAME}" -- sudo -u tfsuser env CONFIG_PATH="${CONFIG_PATH}" bash -c "/home/tfsuser/bootstrap-julia.sh"
+  fi
 
 fi
 
