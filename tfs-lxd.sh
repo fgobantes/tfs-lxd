@@ -134,7 +134,7 @@ if [[ "$DEPLOYMENT_COMPLETE" == "true" ]]; then
   # '
 
   # After part 2 completes, run Julia setup
-  if [[ "$RUN_JULIA_BOOTSTRAP" == "true" ]]; then
+  if [[ "$RUN_JULIA" == "true" ]]; then
     echo "[lxd] Part 2 complete, running Julia setup..."
     ${USE_SUDO} lxc file push "./bootstrap-julia.sh" "${VM_NAME}/home/tfsuser/bootstrap-julia.sh"
     ${USE_SUDO} lxc exec "${VM_NAME}" -- bash -c 'chown tfsuser:tfsuser /home/tfsuser/bootstrap-julia.sh && chmod +x /home/tfsuser/bootstrap-julia.sh'
@@ -187,7 +187,7 @@ if [[ "$PART1_COMPLETE" == "true" && "$DEPLOYMENT_COMPLETE" == "false" ]]; then
   ${USE_SUDO} lxc exec "${VM_NAME}" -- sudo -u tfsuser bash -c "/home/tfsuser/bootstrap-part2.sh"
 
   # After part 2 completes, run Julia setup
-  if [[ "$RUN_JULIA_BOOTSTRAP" == "true" ]]; then
+  if [[ "$RUN_JULIA" == "true" ]]; then
     echo "[lxd] Part 2 complete, running Julia setup..."
     ${USE_SUDO} lxc file push "./bootstrap-julia.sh" "${VM_NAME}/home/tfsuser/bootstrap-julia.sh"
     ${USE_SUDO} lxc exec "${VM_NAME}" -- bash -c 'chown tfsuser:tfsuser /home/tfsuser/bootstrap-julia.sh && chmod +x /home/tfsuser/bootstrap-julia.sh'

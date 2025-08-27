@@ -120,7 +120,7 @@ if [ "$REPOS_CLONED" = false ]; then
     fi
 
     if [ ! -d "MINDFulTeraFlowSDN.jl" ]; then
-        git clone https://github.com/UniStuttgart-IKR/MINDFulTeraFlowSDN.jl
+        git clone --branch ma1069 https://github.com/fgobantes/MINDFulTeraFlowSDN.jl.git
     fi
 else
     echo "[3/4] Repositories already cloned ✓"

@@ -55,10 +55,12 @@ cd $HOME/MINDFulTeraFlowSDN.jl
 
 # Check if project is already instantiated and activate it
 echo "Activating and instantiating Julia project..."
-julia --project=. -e "using Pkg; Pkg.activate("."); Pkg.instantiate()"
+julia --project=. -e 'using Pkg; Pkg.activate("."); Pkg.instantiate()'
 
 CONFIG_PATH="${CONFIG_PATH:-test/data/config3.toml}"
-julia --project=. -e "push!(ARGS, "${CONFIG_PATH}"); push!(ARGS, "127.0.0.1"); using MINDFulTeraFlowSDN; MINDFulTeraFlowSDN.main()" 
+export CONFIG_PATH
+julia --project=. -e 'using MINDFulTeraFlowSDN; MINDFulTeraFlowSDN.main()' $CONFIG_PATH "127.0.0.1"
+#julia --project=. -e 'push!(ARGS, "${CONFIG_PATH}"); push!(ARGS, "127.0.0.1"); using MINDFulTeraFlowSDN; MINDFulTeraFlowSDN.main()'
 
 # Run TeraFlow setup
 # echo "[3/4] Checking TeraFlow contexts and topology..."
